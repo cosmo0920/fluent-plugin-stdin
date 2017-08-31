@@ -1,8 +1,10 @@
-require 'fluent/input'
+require 'fluent/plugin/input'
 
-module Fluent
+module Fluent::Plugin
   class StdinInput < Input
-    Plugin.register_input('stdin', self)
+    Fluent::Plugin.register_input('stdin', self)
+
+    helpers :parser, :compat_parameters, :thread
 
     config_param :format, :string
     config_param :delimiter, :string, :default => "\n"
@@ -10,19 +12,20 @@ module Fluent
     config_param :stop_at_finished, :bool, :default => true
 
     def configure(conf)
+      compat_parameters_convert(conf, :parser)
       super
 
-      @parser = Plugin.new_parser(@format)
-      @parser.configure(conf)
+      @parser = parser_create
     end
 
     def start
+      super
       @buffer = "".force_encoding('ASCII-8BIT')
-      @thread = Thread.new(&method(:run))
+      thread_create(:in_stdin_run, &method(:run))
     end
 
     def shutdown
-      @thread.join
+      super
     end
 
     def run

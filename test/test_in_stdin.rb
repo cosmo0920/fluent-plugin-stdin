@@ -1,4 +1,5 @@
 require 'fluent/test'
+require 'fluent/test/driver/input'
 require 'fluent/plugin/in_stdin'
 
 class StdinInputTest < Test::Unit::TestCase
@@ -14,7 +15,7 @@ class StdinInputTest < Test::Unit::TestCase
   end
 
   def create_driver(conf)
-    Fluent::Test::InputTestDriver.new(Fluent::StdinInput).configure(conf)
+    Fluent::Test::Driver::Input.new(Fluent::Plugin::StdinInput).configure(conf)
   end
 
   def test_configure
@@ -45,14 +46,14 @@ class StdinInputTest < Test::Unit::TestCase
         sleep 1
       end
 
-      compare_test_result(d.emits, tests)
+      compare_test_result(d.events, tests)
     end
   }
 
-  def compare_test_result(emits, tests)
-    assert_equal(2, emits.size)
-    emits.each_index {|i|
-      assert_equal(tests[i]['expected'], emits[i][2]['message'])
+  def compare_test_result(events, tests)
+    assert_equal(2, events.size)
+    events.each_index {|i|
+      assert_equal(tests[i]['expected'], events[i][2]['message'])
     }
   end
 end

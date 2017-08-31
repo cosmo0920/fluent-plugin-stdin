@@ -44,7 +44,7 @@ module Fluent::Plugin
           # ignore above exceptions because can't re-open stdin automatically
           break
         rescue => e
-          log.error "unexpected error", :error=> e.to_s
+          log.error "unexpected error", :error=> e
           log.error_backtrace
           break
         end
@@ -66,7 +66,7 @@ module Fluent::Plugin
         router.emit(@tag, time, record)
       }
     rescue => e
-      log.error msg.dump, :error => e, :error_class => e.class
+      log.error msg.dump, :error => e
       log.error_backtrace
     end
   end
